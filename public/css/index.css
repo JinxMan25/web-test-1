@@ -1,0 +1,18 @@
+#disconnect {
+	display: none;
+}
+
+.actions div {
+	padding: 10px;
+}
+
+.actions > div {
+	padding: 10px;
+}
+
+.actions div input {
+	width: 50px;
+	height: 50px;
+	border: 1px solid rgba(24,24,24, 0.4);
+	outline: none;
+}
