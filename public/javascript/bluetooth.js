@@ -7,104 +7,174 @@ const PRIMARY_SERVICE_UUID = '0000ffe0-0000-1000-8000-00805f9b34fb';
 const CHARACTERISTIC_UUID = '0000ffe1-0000-1000-8000-00805f9b34fb';
 var omdConnected = false;
 
-$(document).ready(function() {
-	$(".mode select").on('change', function() {
-		var mode = this.value;
-		sendToOMDDevice({ mode: mode });
-	});
+const kCodeToMode = {
+  100: "BALANCE",
+  101: "OMD",
+  102: "AXE_550_CALIBRATE",
+  103: "OFF",
+};
 
-	$(".on-sequence button").on('click', function() {
-		var value = $(".on-sequence input").val();
+const MAX_GO_VALUE = 30;
+const MIN_GO_VALUE = 15;
+
+$(document).ready(function() {
+  $(".mode select").on('change', function() {
+    var mode = this.value;
+    var modeCode = Object.keys(kCodeToMode).find(key => kCodeToMode[key] === mode);
+
+    if (!mode || !modeCode) {
+      alert("Mode not recognized");
+      return;
+    }
+
+    sendToOMDDevice({
+      mode: mode
+    });
+  });
+
+  $(".on-sequence button").on('click', function() {
+    var value = $(".on-sequence input").val();
+
     if (value > 1000) {
-			alert("Cannot increase on sequence beyond 1000ms");
-			return;
-		}
+      alert("Cannot increase on sequence beyond 1000ms");
+      return;
+    }
 
     if (value < 50) {
-			alert("Cannot increase on sequence less than 50ms");
-			return;
-		}
+      alert("Cannot increase on sequence less than 50ms");
+      return;
+    }
 
-		sendToOMDDevice({ on: value });
-		$(".on-sequence input").val("");
-	});
+    sendToOMDDevice({
+      on: (value/10).toString()
+    });
 
-	$(".off-sequence button").on('click', function() {
-		var value = $(".off-sequence input").val();
-		sendToOMDDevice({ off: value });
-		$(".off-sequence input").val("");
-	});
+    $(".on-sequence input").val("");
+  });
 
-	$(".speed button").on('click', function() {
-		var value = $(".speed input").val();
+  $(".off-sequence button").on('click', function() {
+    var value = $(".off-sequence input").val();
+    sendToOMDDevice({
+      off: (value/10).toString()
+    });
+    $(".off-sequence input").val("");
+  });
 
-		if (value > 130) {
-			alert("Can't go above 130");
-			return;
-		}
+  $(".speed button").on('click', function() {
+    var value = $($($($($(this).parent()[0]).prev()[0])[0])[0]).children().val()
+    var esc = $(this).data("label");
 
-		if (value < 100) {
-			alert("Can't go blow 100");
-			return;
-		}
+    if (value > MAX_GO_VALUE) {
+      alert("Can't go above 30");
+      return;
+    }
 
-		sendToOMDDevice({ hz: value });
-		$(".speed input").val("");
-	});
+    if (value < MIN_GO_VALUE) {
+      alert("Can't go blow 15");
+      return;
+    }
 
-	$(".shutdown button").on('click', function() {
-		var value = this.value;
-		sendToOMDDevice({ mode: "OFF" });
-	});
+    sendToOMDDevice({
+      [`${esc}Speed`]: value
+    });
 
-	var button = document.getElementById("pair");
-	button.addEventListener('touchend', function(event) {
-		navigator.bluetooth.requestDevice({acceptAllDevices: true, optionalServices: [PRIMARY_SERVICE_UUID]})
-		 .then(device => {
-				return device.gatt.connect();
-		 }).then((server) => {
-				omdConnected = true;
-				btServer = server;
-				$("#pair").hide();
-				$("#disconnect").show();
-				return server.getPrimaryService(PRIMARY_SERVICE_UUID);
-		 }).then((service) => {
-				 btService = service;
-				 return service.getCharacteristic(CHARACTERISTIC_UUID);
-		 }).then((characteristic) => {
-				 btCharacteristic = characteristic;
-				 btCharacteristic.startNotifications();
-				 //setTimeout(() => characteristic.writeValue(encode(json)), 500);
-		 }).then(characteristic => {
-				btCharacteristic.addEventListener('characteristicvaluechanged', handleCharacteristicValueChanged);
-				console.log('Notifications have been started.');
-		 });
-	});
+    $(this).val(value);
+  });
 
-	function handleCharacteristicValueChanged(event) {
-		const value = event.target.value;
-		var enc = new TextDecoder("utf-8");
+  $(".shutdown button").on('click', function() {
+    var value = this.value;
+    sendToOMDDevice({
+      mode: "OFF"
+    });
+  });
+
+  var button = document.getElementById("pair");
+  button.addEventListener('touchend', function(event) {
+    navigator.bluetooth.requestDevice({
+        acceptAllDevices: true,
+        optionalServices: [PRIMARY_SERVICE_UUID]
+      })
+      .then(device => {
+        return device.gatt.connect();
+      }).then((server) => {
+        omdConnected = true;
+        btServer = server;
+        $("#pair").hide();
+        $("#disconnect").show();
+        return server.getPrimaryService(PRIMARY_SERVICE_UUID);
+      }).then((service) => {
+        btService = service;
+        return service.getCharacteristic(CHARACTERISTIC_UUID);
+      }).then((characteristic) => {
+        btCharacteristic = characteristic;
+        btCharacteristic.startNotifications();
+        //setTimeout(() => characteristic.writeValue(encode(json)), 500);
+      }).then(characteristic => {
+        btCharacteristic.addEventListener('characteristicvaluechanged', handleCharacteristicValueChanged);
+        console.log('Notifications have been started.');
+        sendToOMDDevice({
+          op: "INIT"
+        });
+      });
+  });
+
+  function handleCharacteristicValueChanged(event) {
+    const value = event.target.value;
+    var enc = new TextDecoder("utf-8");
     var jsonStringified = enc.decode(value);
     var json = JSON.parse(jsonStringified);
-		processData(json);
-	}
+    console.log(json);
+    processData(json);
+  }
 
-	function sendToOMDDevice(json) {
-		if (!btCharacteristic) {
-			alert("Can't send. Lost connection or not connected");
-			return;
-		}
+  function sendToOMDDevice(json) {
+    if (!btCharacteristic) {
+      alert("Can't send. Lost connection or not connected");
+      return;
+    }
 
-		btCharacteristic.writeValue(encode(json));
-	}
+    btCharacteristic.writeValue(encode(json));
+  }
 
-	function processData(json) {
-		if (json["temp"]) {
-			$(".temperature .reading").html(json["temp"]);
-		}
-	}
+  function processData(json) {
+    if (json["temp"]) {
+      $(".temperature .reading").html(json["temp"]);
+    }
+
+    if (json["esc1"]) {
+      $(".esc1 input").val(json["esc1"]);
+    }
+
+    if (json["esc2"]) {
+      $(".esc2 input").val(json["esc2"]);
+    }
+
+    if (json["esc3"]) {
+      $(".esc3 input").val(json["esc3"]);
+    }
+
+    if (json["balance"]) {
+      $(".balance input").val(json["balance"]);
+    }
+
+    if (json["mode"]) {
+      var modeCode = json["mode"];
+      var mode = kCodeToMode[modeCode];
+      $(".mode select").val(mode);
+    }
+
+    if (json["on"]) {
+      var on = json["on"];
+      $(".on-sequence input").val(on*10);
+    }
+
+    if (json["off"]) {
+      var off = json["off"];
+      $(".off-sequence input").val(off*10);
+    }
+  }
 
   function encode(json) {
-		return new TextEncoder().encode(`<${JSON.stringify(json)}>`);
-	}
+    return new TextEncoder().encode(`<${JSON.stringify(json)}>`);
+  }
 });

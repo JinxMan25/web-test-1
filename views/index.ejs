@@ -1,62 +1,91 @@
 <html>
   <head>
     <script src="javascript/jquery.min.js"/></script>
-		<link rel="stylesheet" href="css/index.css"/>
+    <link rel="stylesheet" href="css/index.css"/>
   </head>
   <div>
-     <button id="pair">Connect</button>
-     <button id="disconnect">Disconnect</button>
+    <button id="pair">Connect</button>
+    <button id="disconnect">Disconnect</button>
   </div>
   <div class="actions">
-    <div class="mode">
-			<label>Mode:</label>
-			<span>
-				<select>
-					<option value="OMD">OMD</option>
-					<option value="BALANCE">BALANCE</option>
-					<option value="CALIBRATE">AXE 550 CALIBRATE</option>
-				</select>
-			</span>
-		</div>
-    <div class="on-sequence">
-			<label>On sequence speed:</label>
-			<span>
-				<input></input>
-			</span>
-			<span>
-				<button id="set">set</button>
-			</span>
-		</div>
-    <div class="off-sequence">
-			<label>Off sequence speed:</label>
-			<span>
-				<input></input>
-			</span>
-			<span>
-				<button id="set">set</button>
-			</span>
-		</div>
-    <div class="speed">
-			<label>Speed:</label>
-			<span>
-				<input></input>
-			</span>
-			<span>
-				<button id="set">set</button>
-			</span>
-		</div>
+  <div class="mode">
+    <label>Mode:</label>
+    <span>
+      <select>
+        <option value="OMD">OMD</option>
+        <option value="BALANCE">BALANCE</option>
+        <option value="CALIBRATE">AXE 550 CALIBRATE</option>
+        <option value="OFF">OFF</option>
+      </select>
+    </span>
   </div>
-	<div>
-		<div class="readings">
-			<div class="temperature">
-				<span>Temperature:</span>
-				<span class="reading">...</span>
-			</div>
-			<div class="speed">
-				<span>Speed:</span>
-				<span class="reading">...</span>
-			</div>
-		</div>
-	</div>
+  <div class="on-sequence">
+    <label>On sequence speed:</label>
+    <span>
+    <input></input>
+    </span>
+    <span>
+    <button id="set">set</button>
+    </span>
+  </div>
+  <div class="off-sequence">
+    <label>Off sequence speed:</label>
+    <span>
+    <input></input>
+    </span>
+    <span>
+    <button id="set">set</button>
+    </span>
+  </div>
+  <div class="speed">
+    <div class="esc1">
+      <label>ESC1 speed value:</label>
+      <span>
+      <input data-label="esc1" placeholder="esc1"></input>
+      </span>
+      <span>
+      <button data-label="esc1" id="set">set</button>
+      </span>
+    </div>
+    <div class="esc2">
+      <label>ESC2 speed value:</label>
+      <span>
+      <input data-label="esc2" placeholder="esc2"></input>
+      </span>
+      <span>
+      <button data-label="esc2" id="set">set</button>
+      </span>
+    </div>
+    <div class="esc3">
+      <label>ESC3 speed value:</label>
+      <span>
+      <input data-label="esc3" placeholder="esc3"></input>
+      </span>
+      <span>
+      <button data-label="esc3" id="set">set</button>
+      </span>
+      <div class="balance">
+        <label>Balance speed value for all ESCs:</label>
+        <span>
+        <input data-label="balance" placeholder="Balance speed"></input>
+        </span>
+        <span>
+        <button data-label="balance" id="set">set</button>
+        </span>
+      </div>
+    </div>
+  </div>
+  <div>
+    <div class="readings">
+      <div class="temperature">
+        <span>Temperature:</span>
+        <span class="reading">...</span>
+      </div>
+      <div class="speed">
+        <span>Speed:</span>
+        <span class="reading">...</span>
+      </div>
+    </div>
+  </div>
   <script src="javascript/bluetooth.js"/></script>
 </html>
