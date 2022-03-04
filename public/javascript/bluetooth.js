@@ -141,6 +141,14 @@ $(document).ready(function() {
       $(".temperature .reading").html(json["temp"]);
     }
 
+    if (json["min"]) {
+      $(".min .reading").html(json["min"]);
+    }
+
+    if (json["max"]) {
+      $(".max .reading").html(json["max"]);
+    }
+
     if (json["esc1"]) {
       $(".esc1 input").val(json["esc1"]);
     }
