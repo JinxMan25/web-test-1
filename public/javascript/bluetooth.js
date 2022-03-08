@@ -3,6 +3,7 @@
 var btServer;
 var btService;
 var btCharacteristic;
+var btDevice;
 const PRIMARY_SERVICE_UUID = '0000ffe0-0000-1000-8000-00805f9b34fb';
 const CHARACTERISTIC_UUID = '0000ffe1-0000-1000-8000-00805f9b34fb';
 var omdConnected = false;
@@ -14,8 +15,54 @@ const kCodeToMode = {
   103: "OFF",
 };
 
-const MAX_GO_VALUE = 30;
-const MIN_GO_VALUE = 15;
+const MAX_GO_VALUE = 65;
+const MIN_GO_VALUE = 1;
+
+async function connect() {
+  exponentialBackoff(50 /* max retries */, 2 /* seconds delay */,
+    async function toTry() {
+      time('Connecting to Bluetooth Device... ');
+      await btDevice.gatt.connect();
+    },
+    function success() {
+      console.log('> Bluetooth Device connected. Try disconnect it now.');
+    },
+    function fail() {
+      time('Failed to reconnect.');
+    });
+}
+
+function onDisconnected() {
+  console.log('> Bluetooth Device disconnected');
+  omdConnected = false;
+  $("#pair").show();
+  $("#disconnect").hide();
+  connect();
+}
+
+/* Utils */
+
+// This function keeps calling "toTry" until promise resolves or has
+// retried "max" number of times. First retry has a delay of "delay" seconds.
+// "success" is called upon success.
+async function exponentialBackoff(max, delay, toTry, success, fail) {
+  try {
+    const result = await toTry();
+    success(result);
+  } catch(error) {
+    if (max === 0) {
+      return fail();
+    }
+    time('Retrying in ' + delay + 's... (' + max + ' tries left)');
+    setTimeout(function() {
+      exponentialBackoff(--max, delay * 2, toTry, success, fail);
+    }, delay * 1000);
+  }
+}
+
+function time(text) {
+  console.log('[' + new Date().toJSON().substr(11, 8) + '] ' + text);
+}
 
 $(document).ready(function() {
   $(".mode select").on('change', function() {
@@ -65,7 +112,7 @@ $(document).ready(function() {
     var esc = $(this).data("label");
 
     if (value > MAX_GO_VALUE) {
-      alert("Can't go above 30");
+      alert("Can't go above 60");
       return;
     }
 
@@ -95,7 +142,9 @@ $(document).ready(function() {
         optionalServices: [PRIMARY_SERVICE_UUID]
       })
       .then(device => {
-        return device.gatt.connect();
+        btDevice = device;
+        btDevice.addEventListener('gattserverdisconnected', onDisconnected);
+        return btDevice.gatt.connect();
       }).then((server) => {
         omdConnected = true;
         btServer = server;
