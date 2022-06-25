@@ -1,95 +1,125 @@
-<html>
-  <head>
-    <script src="javascript/jquery.min.js"/></script>
-    <link rel="stylesheet" href="css/index.css"/>
-  </head>
-  <div>
-    <button id="pair">Connect</button>
-    <button id="disconnect">Disconnect</button>
+<!doctype html>
+<html lang="en">
+
+<head>
+  <script src="javascript/jquery.min.js" />
+  </script>
+  <script src="javascript/bootstrap.bundle.min.js" />
+  </script>
+  <link rel="stylesheet" href="css/bootstrap.min.css" />
+  <link rel="stylesheet" href="css/index.css" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+
+<body>
+  <div class="container jumbotron">
+    <button class="btn btn-block btn-success" id="pair">Connect</button>
+    <button class="btn btn-block btn-danger" id="disconnect">Disconnect</button>
   </div>
-  <div class="actions">
-  <div class="mode">
-    <label>Mode:</label>
-    <span>
-      <select>
-        <option value="OMD">OMD</option>
-        <option value="BALANCE">BALANCE</option>
-        <option value="CALIBRATE">AXE 550 CALIBRATE</option>
-        <option value="OFF">OFF</option>
-      </select>
-    </span>
-  </div>
-  <div class="on-sequence">
-    <label>On sequence speed:</label>
-    <span>
-    <input></input>
-    </span>
-    <span>
-    <button id="set">set</button>
-    </span>
-  </div>
-  <div class="off-sequence">
-    <label>Off sequence speed:</label>
-    <span>
-    <input></input>
-    </span>
-    <span>
-    <button id="set">set</button>
-    </span>
-  </div>
-  <div class="speed">
-    <div class="esc1">
-      <label>ESC1 speed value:</label>
+  <div class="container jumbotron actions">
+    <div class="mode form-group  form-group-lg">
+      <label>Mode:</label>
       <span>
-      <input data-label="esc1" placeholder="esc1"></input>
-      </span>
-      <span>
-      <button data-label="esc1" id="set">set</button>
+        <select class="form-control input-sm" style="font-size: 1.5em">
+          <option value="OMD">OMD</option>
+          <option value="BALANCE">BALANCE</option>
+          <option value="CALIBRATE">AXE 550 CALIBRATE</option>
+          <option value="OFF">OFF</option>
+        </select>
       </span>
     </div>
-    <div class="esc2">
-      <label>ESC2 speed value:</label>
+    <div class="on-sequence">
+      <label>On sequence speed:</label>
       <span>
-      <input data-label="esc2" placeholder="esc2"></input>
+        <input type="number"></input>
       </span>
       <span>
-      <button data-label="esc2" id="set">set</button>
+        <button id="set">set</button>
       </span>
     </div>
-    <div class="esc3">
-      <label>ESC3 speed value:</label>
+    <div class="off-sequence">
+      <label>Off sequence speed:</label>
       <span>
-      <input data-label="esc3" placeholder="esc3"></input>
+        <input type="number"></input>
       </span>
       <span>
-      <button data-label="esc3" id="set">set</button>
+        <button id="set">set</button>
       </span>
-      <div class="balance">
-        <label>Balance speed value for all ESCs:</label>
-        <span>
-        <input data-label="balance" placeholder="Balance speed"></input>
-        </span>
-        <span>
-        <button data-label="balance" id="set">set</button>
-        </span>
+    </div>
+  </div>
+
+  <div class="container jumbotron readings">
+    <div class="temperature">
+      <span>Temperature:</span>
+      <span class="reading">...</span>
+    </div>
+    <div class="max">
+      <span>Peak frequency:</span>
+      <span class="reading">...</span>
+    </div>
+    <div class="min">
+      <span>Min frequency:</span>
+      <span class="reading">...</span>
+    </div>
+  </div>
+
+  <div class="container jumbotron speed">
+    <h2>Manual Set Speed</h2>
+
+    <h3>OMD Mode</h3>
+    <div class="row esc1">
+      <div class="col">
+        <label>ESC1:</label>
+      </div>
+      <div class="col">
+        <input data-label="esc1" placeholder="esc1" type="number"></input>
+      </div>
+      <div class="col">
+        <button data-label="esc1" id="set" class="btn btn-primary">set</button>
+      </div>
+    </div>
+    <div class="row esc2">
+      <div class="col">
+        <label>ESC2:</label>
+      </div>
+      <div class="col">
+        <input data-label="esc2" placeholder="esc2" type="number"></input>
+      </div>
+      <div class="col">
+        <button data-label="esc2" id="set" class="btn btn-primary">set</button>
+      </div>
+    </div>
+    <div class="row esc3">
+      <div class="col">
+        <label>ESC3:</label>
+      </div>
+      <div class="col">
+        <input data-label="esc3" placeholder="esc3" type="number"></input>
+      </div>
+      <div class="col">
+        <button data-label="esc3" id="set" class="btn btn-primary">set</button>
+      </div>
+    </div>
+
+    <h3>Balance Mode</h3>
+    <div class="row balance">
+      <div class="col">
+        <label>All ESCs:</label>
+      </div>
+      <div class="col">
+        <input data-label="balance" placeholder="Balance speed" type="number"></input>
+      </div>
+      <div class="col">
+        <button data-label="balance" id="set" class="btn btn-primary">set</button>
       </div>
     </div>
   </div>
-  <div>
-    <div class="readings">
-      <div class="temperature">
-        <span>Temperature:</span>
-        <span class="reading">...</span>
-      </div>
-      <div class="max">
-        <span>Peak frequency:</span>
-        <span class="reading">...</span>
-      </div>
-      <div class="min">
-        <span>Min frequency:</span>
-        <span class="reading">...</span>
-      </div>
-    </div>
   </div>
-  <script src="javascript/bluetooth.js"/></script>
+
+  <script src="javascript/bluetooth.js" />
+  </script>
+
+</body>
+
 </html>
