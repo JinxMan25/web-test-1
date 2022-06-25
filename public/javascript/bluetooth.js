@@ -15,8 +15,8 @@ const kCodeToMode = {
   103: "OFF",
 };
 
-const MAX_GO_VALUE = 65;
-const MIN_GO_VALUE = 1;
+const MAX_GO_VALUE = 120;
+const MIN_GO_VALUE = 0;
 
 async function connect() {
   exponentialBackoff(50 /* max retries */, 2 /* seconds delay */,
@@ -112,12 +112,12 @@ $(document).ready(function() {
     var esc = $(this).data("label");
 
     if (value > MAX_GO_VALUE) {
-      alert("Can't go above 60");
+      alert(`Can't go above ${MAX_GO_VALUE}`);
       return;
     }
 
     if (value < MIN_GO_VALUE) {
-      alert("Can't go blow 15");
+      alert(`Can't go blow ${MIN_GO_VALUE}`);
       return;
     }
 
@@ -136,6 +136,7 @@ $(document).ready(function() {
   });
 
   var button = document.getElementById("pair");
+  console.log({button});
   button.addEventListener('touchend', function(event) {
     navigator.bluetooth.requestDevice({
         acceptAllDevices: true,
